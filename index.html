@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Book Library Catalog</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        pre {
+            background-color: #f4f4f4;
+            padding: 10px;
+            border: 1px solid #ddd;
+            overflow-x: auto;
+        }
+    </style>
+</head>
+<body>
+    <h1>Book Library Catalog</h1>
+    <pre><code>
+#include &lt;iostream&gt;
+#include &lt;vector&gt;
+#include &lt;string&gt;
+#include &lt;algorithm&gt;
+
+class Book {
+public:
+    std::string title;
+    std::string author;
+    bool is_borrowed;
+
+    Book(std::string t, std::string a) : title(t), author(a), is_borrowed(false) {}
+};
+
+class Library {
+private:
+    std::vector&lt;Book&gt; books;
+
+public:
+    void add_book(const std::string&amp; title, const std::string&amp; author) {
+        books.push_back(Book(title, author));
+    }
+
+    void remove_book(const std::string&amp; title) {
+        books.erase(std::remove_if(books.begin(), books.end(), 
+                   [&amp;](const Book&amp; book) { return book.title == title; }), books.end());
+    }
+
+    std::vector&lt;Book&gt; search_by_title(const std::string&amp; title) {
+        std::vector&lt;Book&gt; result;
+        for (const auto&amp; book : books) {
+            if (book.title.find(title) != std::string::npos) {
+                result.push_back(book);
+            }
+        }
+        return result;
+    }
+
+    std::vector&lt;Book&gt; search_by_author(const std::string&amp; author) {
+        std::vector&lt;Book&gt; result;
+        for (const auto&amp; book : books) {
+            if (book.author.find(author) != std::string::npos) {
+                result.push_back(book);
+            }
+        }
+        return result;
+    }
+
+    std::string borrow_book(const std::string&amp; title) {
+        for (auto&amp; book : books) {
+            if (book.title == title &amp;&amp; !book.is_borrowed) {
+                book.is_borrowed = true;
+                return "You have borrowed '" + title + "'";
+            }
+        }
+        return "'" + title + "' is not available.";
+    }
+
+    std::string return_book(const std::string&amp; title) {
+        for (auto&amp; book : books) {
+            if (book.title == title &amp;&amp; book.is_borrowed) {
+                book.is_borrowed = false;
+                return "You have returned '" + title + "'";
+            }
+        }
+        return "'" + title + "' was not borrowed.";
+    }
+
+    int total_books() {
+        return books.size();
+    }
+
+    int borrowed_books() {
+        return std::count_if(books.begin(), books.end(), [](const Book&amp; book) { return book.is_borrowed; });
+    }
+};
+
+int main() {
+    Library library;
+
+    // Add books
+    library.add_book("The Catcher in the Rye", "J.D. Salinger");
+    library.add_book("To Kill a Mockingbird", "Harper Lee");
+
+    // Search for a book by title
+    std::vector&lt;Book&gt; found_books = library.search_by_title("Mockingbird");
+    for (const auto&amp; book : found_books) {
+        std::cout &lt;&lt; "Found: " &lt;&lt; book.title &lt;&lt; " by " &lt;&lt; book.author &lt;&lt; std::endl;
+    }
+
+    // Borrow and return books
+    std::cout &lt;&lt; library.borrow_book("To Kill a Mockingbird") &lt;&lt; std::endl;
+    std::cout &lt;&lt; library.return_book("To Kill a Mockingbird") &lt;&lt; std::endl;
+
+    // Generate statistics
+    std::cout &lt;&lt; "Total books: " &lt;&lt; library.total_books() &lt;&lt; std::endl;
+    std::cout &lt;&lt; "Borrowed books: " &lt;&lt; library.borrowed_books() &lt;&lt; std::endl;
+
+    return 0;
+}
+    </code></pre>
+</body>
+</html>
